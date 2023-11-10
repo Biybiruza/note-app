@@ -15,6 +15,7 @@ import com.biybiruza.noteapp.MyShared;
 import com.biybiruza.noteapp.R;
 import com.biybiruza.noteapp.data.NoteModels;
 import com.biybiruza.noteapp.databinding.FragmentDetailBinding;
+import com.biybiruza.noteapp.ui.network.DBHelper;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class DetailFragment extends Fragment {
     private int position;
     private List<NoteModels> list;
     private MyShared myShared;
+    DBHelper dbHelper = null;
+    NoteModels models;
 
 
     @Override
@@ -43,8 +46,12 @@ public class DetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         myShared = new MyShared(requireContext(), new Gson());
+        dbHelper = new DBHelper(requireContext());
 
         position = requireArguments().getInt("position", 0);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            models = getArguments().getSerializable("model", NoteModels.class);
+        }
 
         loadData();
 
@@ -53,11 +60,24 @@ public class DetailFragment extends Fragment {
             public void onClick(View view) {
                 Bundle bundle = new Bundle();
                 bundle.putString("type", "edit");
-                /*getFragmentManager().beginTransaction()
+                bundle.putSerializable("model",models);
+                getFragmentManager().popBackStack();
+                getFragmentManager().beginTransaction()
                         .replace(R.id.fragment, AddNoteFragment.class, bundle)
                         .addToBackStack("name3")
-                        .commit();*/
+                        .commit();
 
+
+
+                /*getFragmentManager().beginTransaction()
+                        .remove(DetailFragment.this)
+                        .commit();*/
+            }
+        });
+
+        binding.ivBackBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 getFragmentManager().popBackStack();
 
                 getFragmentManager().beginTransaction()
@@ -69,8 +89,12 @@ public class DetailFragment extends Fragment {
 
     private void loadData() {
         list = new ArrayList<>();
-        if (myShared.getList("key", NoteModels.class) != null) {
-            list.addAll(myShared.getList("key", NoteModels.class));
+//        if (myShared.getList("key", NoteModels.class) != null) {
+//            list.addAll(myShared.getList("key", NoteModels.class));
+//        }
+
+        if (dbHelper.getNotes() != null) {
+            list.addAll(dbHelper.getNotes());
         }
 
         binding.tvNoteTitle.setText(list.get(position).getTitle());

@@ -22,6 +22,7 @@ import com.biybiruza.noteapp.MyShared;
 import com.biybiruza.noteapp.R;
 import com.biybiruza.noteapp.data.NoteModels;
 import com.biybiruza.noteapp.databinding.FragmentMainBinding;
+import com.biybiruza.noteapp.ui.network.DBHelper;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class MainFragment extends Fragment {
     AdapterNote adapterNote;
     MyShared myShared;
     List<NoteModels> list = new ArrayList<>();
+    DBHelper dbHelper = null;
 
     @Nullable
     @Override
@@ -49,6 +51,7 @@ public class MainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        dbHelper = new DBHelper(requireActivity());
         myShared = new MyShared(requireContext(),new Gson());
 
         Log.d("TAG", "onViewCreated: ");
@@ -112,8 +115,8 @@ public class MainFragment extends Fragment {
     private void loadData() {
         list.clear();
 
-        if (myShared.getList("key", NoteModels.class) != null) {
-             list.addAll(myShared.getList("key", NoteModels.class));
+        if (dbHelper.getNotes() != null) {
+             list.addAll(dbHelper.getNotes());
 
             binding.tvTextView.setVisibility(View.GONE);
             binding.rvContact.setVisibility(View.VISIBLE);
@@ -127,9 +130,10 @@ public class MainFragment extends Fragment {
                 list,
                 new AdapterNote.OnItemClickListener() {
                     @Override
-                    public void onItemClick(int position) {
+                    public void onItemClick(int position,NoteModels models) {
                         Bundle bundle = new Bundle();
                         bundle.putInt("position", position);
+                        bundle.putSerializable("model",models);
 
                         getFragmentManager().beginTransaction()
                                 .replace(R.id.fragment, DetailFragment.class, bundle)
@@ -139,10 +143,11 @@ public class MainFragment extends Fragment {
                 },
                 new AdapterNote.OnEditClickListener() {
                     @Override
-                    public void onEditClick(int position) {
+                    public void onEditClick(int position,NoteModels models) {
                         Bundle bundle = new Bundle();
                         bundle.putString("type","edit");
                         bundle.putInt("position", position);
+                        bundle.putSerializable("model", models);
 
                         getFragmentManager().beginTransaction()
                                 .replace(R.id.fragment, AddNoteFragment.class, bundle)
@@ -152,8 +157,8 @@ public class MainFragment extends Fragment {
                 },
                 new AdapterNote.OnDeleteClickListener() {
                     @Override
-                    public void onDeleteClick(int position) {
-                        deleteNotes(position);
+                    public void onDeleteClick(int position,int id) {
+                        deleteNotes(position,id);
                     }
                 }
         );
@@ -163,7 +168,7 @@ public class MainFragment extends Fragment {
         binding.rvContact.setAdapter(adapterNote);
     }
 
-    private void deleteNotes(int position) {
+    private void deleteNotes(int position,int noteId) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
         builder.setMessage("Are you sure you want to delete this contact?");
@@ -174,10 +179,12 @@ public class MainFragment extends Fragment {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked OK button
 
+//                list.remove(position);
+                dbHelper.deleteNotes(noteId);
                 list.remove(position);
                 Toast.makeText(requireContext(), "deleted", Toast.LENGTH_SHORT).show();
-                myShared.putList("key",list);
 
+                adapterNote.notifyItemRemoved(position);
                 adapterNote.notifyDataSetChanged();
                 binding.rvContact.setAdapter(adapterNote);
 
