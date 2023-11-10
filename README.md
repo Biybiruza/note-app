@@ -13,8 +13,6 @@ auth screen:
 ![screen2!](video/note_app.gif)
 </p>
 
-
-<img ![screen1!](video/note_app.gif)
+<img ![screen1!](video/task_38.gif)
 width="200">
 
-[//]: # (![screen1!]&#40;video/note_app.gif&#41;)
