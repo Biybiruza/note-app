@@ -10,9 +10,6 @@ auth screen:
 <p align="left">
   <img src="video/note_app.gif" alt="SR GUI Opening window"
        width="300">
-![screen2!](video/note_app.gif)
+![screen2!](video/task_38.gif)
 </p>
-
-<img ![screen1!](video/task_38.gif)
-width="200">
 
