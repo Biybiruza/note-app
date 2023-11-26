@@ -1,11 +1,11 @@
-# movie_app
+# note_app
 
-New Quiz app
+New Note app
 
 ## Getting Started
 
 
-auth screen:
+Full function:
 
 <p align="left">
   <img src="video/task_38.gif" alt="SR GUI Opening window"
