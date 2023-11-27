@@ -20,6 +20,7 @@ import com.biybiruza.noteapp.ui.network.DBHelper;
 import com.google.gson.Gson;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,11 +93,11 @@ public class AddNoteFragment extends Fragment {
     private void editNote() {
         Long timestamp = System.currentTimeMillis();
         Date date = new Date(timestamp);
-        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(requireActivity().getApplication());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd | HH:mm");
 
         models.setTitle(binding.etNoteTitle.getText().toString());
         models.setNote(binding.etNote.getText().toString());
-        models.setDate("" + dateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM).format(date));
+        models.setDate(dateFormat.format(date));
 
         dbHelper.editNotes(models);
 
@@ -119,9 +120,9 @@ public class AddNoteFragment extends Fragment {
         Long timestamp = System.currentTimeMillis();
 
         Date date = new Date(timestamp);
-        DateFormat dateFormat = android.text.format.DateFormat.getDateFormat(requireActivity().getApplication());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("YYYY-MM-dd | HH:mm");
 
-        dbHelper.addNotes(new NoteModels(binding.etNoteTitle.getText().toString(), binding.etNote.getText().toString(), dateFormat.toString()));
+        dbHelper.addNotes(new NoteModels(binding.etNoteTitle.getText().toString(), binding.etNote.getText().toString(), dateFormat.format(date)));
 
         Toast.makeText(requireActivity(), "Saved", Toast.LENGTH_SHORT).show();
 
